@@ -1,0 +1,7 @@
+### v1.1
+- Enhanced repository management by checking for existing entries before adding.
+- Added user feedback messages for repository addition/removal.
+- Improved `while` loops for user input validation.
+- Added logging for package list updates.
+- Enhanced error handling and debugging messages.
+- Improved code readability and efficiency.
