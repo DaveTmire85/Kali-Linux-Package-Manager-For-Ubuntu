@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import subprocess
+import os
 
 # Function to run shell commands
 def run_command(commands):
@@ -33,15 +34,21 @@ kali_repo = "deb http://http.kali.org/kali kali-rolling main non-free contrib"
 sources_list = "/etc/apt/sources.list"
 
 # Manage Kali repositories
-while True:
+repo_action = ""
+while repo_action not in ['add', 'remove', 'skip']:
     repo_action = input("Do you want to add or remove the Kali repositories? (add/remove/skip): ").lower()
-    if repo_action in ['add', 'remove', 'skip']:
-        break
-    print(f"Invalid action '{repo_action}'. Please enter 'add', 'remove', or 'skip'.")
+    if repo_action not in ['add', 'remove', 'skip']:
+        print(f"Invalid action '{repo_action}'. Please enter 'add', 'remove', or 'skip'.")
 
 if repo_action == 'add':
-    with open(sources_list, "a") as file:
-        file.write(f"\n{kali_repo}\n")
+    with open(sources_list, "r") as file:
+        lines = file.readlines()
+    if kali_repo not in lines:
+        with open(sources_list, "a") as file:
+            file.write(f"\n{kali_repo}\n")
+        print("Kali repository added.")
+    else:
+        print("Kali repository already exists.")
 elif repo_action == 'remove':
     with open(sources_list, "r") as file:
         lines = file.readlines()
@@ -49,8 +56,10 @@ elif repo_action == 'remove':
         for line in lines:
             if line.strip() != kali_repo:
                 file.write(line)
+    print("Kali repository removed.")
 
 # Update the package list
+print("Updating package list...")
 run_command(["sudo", "apt-get", "update", "-y"])
 
 # Ask user what action to take for each metapackage
@@ -58,11 +67,11 @@ packages_to_install = []
 packages_to_remove = []
 
 for package in metapackages:
-    while True:
+    action = ""
+    while action not in ['install', 'remove', 'skip']:
         action = input(f"Do you want to install or remove {package}? (install/remove/skip): ").lower()
-        if action in ['install', 'remove', 'skip']:
-            break
-        print(f"Invalid action '{action}'. Please enter 'install', 'remove', or 'skip'.")
+        if action not in ['install', 'remove', 'skip']:
+            print(f"Invalid action '{action}'. Please enter 'install', 'remove', or 'skip'.")
     if action == 'install':
         packages_to_install.append(package)
     elif action == 'remove':
